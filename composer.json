@@ -1,0 +1,40 @@
+{
+    "name": "adnanmula/criteria",
+    "description": "",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Adnan Alfonso Mula Bakkar",
+            "email": "adnan.mula.bakkar@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "doctrine/dbal": "^3.5"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.8",
+        "symfony/var-dumper": "^5.1",
+        "phpro/grumphp": "^1.1",
+        "slevomat/coding-standard": "^8.8"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@auto-scripts",
+            "rm -rf .git/hooks",
+            "cp -r scripts/git-hooks .git/hooks"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "AdnanMula\\Criteria\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpro/grumphp": true
+        }
+    }
+}

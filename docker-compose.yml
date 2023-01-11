@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  php:
+    build: .
+    working_dir: /var/app
+    volumes:
+      - .:/var/app
+      - ~/.composer:/.composer
