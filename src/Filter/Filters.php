@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria\Filter;
+namespace AdnanMula\Criteria\Filter;
 
 final class Filters
 {

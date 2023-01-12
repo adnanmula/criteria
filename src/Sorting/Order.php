@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria\Sorting;
+namespace AdnanMula\Criteria\Sorting;
 
-use AdnanMula\Cards\Infrastructure\Criteria\FilterField\FilterFieldInterface;
+use AdnanMula\Criteria\FilterField\FilterFieldInterface;
 
 final class Order
 {

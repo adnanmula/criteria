@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria;
+namespace AdnanMula\Criteria;
 
-use AdnanMula\Cards\Infrastructure\Criteria\Filter\Filter;
-use AdnanMula\Cards\Infrastructure\Criteria\Filter\FilterType;
-use AdnanMula\Cards\Infrastructure\Criteria\FilterField\FilterFieldInterface;
-use AdnanMula\Cards\Infrastructure\Criteria\FilterValue\FilterOperator;
+use AdnanMula\Criteria\Filter\Filter;
+use AdnanMula\Criteria\Filter\FilterType;
+use AdnanMula\Criteria\FilterField\FilterFieldInterface;
+use AdnanMula\Criteria\FilterValue\FilterOperator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 

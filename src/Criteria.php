@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria;
+namespace AdnanMula\Criteria;
 
-use AdnanMula\Cards\Infrastructure\Criteria\Filter\Filters;
-use AdnanMula\Cards\Infrastructure\Criteria\Sorting\Sorting;
+use AdnanMula\Criteria\Filter\Filters;
+use AdnanMula\Criteria\Sorting\Sorting;
 
 final class Criteria
 {

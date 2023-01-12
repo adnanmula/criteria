@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria\Sorting;
+namespace AdnanMula\Criteria\Sorting;
 
 final class Sorting
 {

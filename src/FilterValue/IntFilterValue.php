@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria\FilterValue;
+namespace AdnanMula\Criteria\FilterValue;
 
 final class IntFilterValue implements FilterValue
 {

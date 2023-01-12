@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Cards\Infrastructure\Criteria\Filter;
+namespace AdnanMula\Criteria\Filter;
 
-use AdnanMula\Cards\Infrastructure\Criteria\FilterField\FilterFieldInterface;
-use AdnanMula\Cards\Infrastructure\Criteria\FilterValue\FilterOperator;
-use AdnanMula\Cards\Infrastructure\Criteria\FilterValue\FilterValue;
+use AdnanMula\Criteria\FilterField\FilterFieldInterface;
+use AdnanMula\Criteria\FilterValue\FilterOperator;
+use AdnanMula\Criteria\FilterValue\FilterValue;
 
 final class Filter
 {
