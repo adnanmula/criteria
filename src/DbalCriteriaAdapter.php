@@ -6,7 +6,7 @@ use AdnanMula\Criteria\Filter\Filter;
 use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterFieldInterface;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 final class DbalCriteriaAdapter implements CriteriaAdapter
@@ -31,7 +31,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
     private function applyFilters(Criteria $criteria): void
     {
-        foreach ($criteria->filters() as $filter) {
+        foreach ($criteria->filterGroups() as $filter) {
             $expressions = \array_map(
                 fn(Filter $expression) => $this->buildExpression($expression),
                 $filter->filters(),
@@ -41,7 +41,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
                 continue;
             }
 
-            if ($filter->filtersType() === FilterType::OR) {
+            if ($filter->filtersGlue() === FilterType::OR) {
                 $expression = $this->queryBuilder->expr()->or(...$expressions);
             } else {
                 $expression = $this->queryBuilder->expr()->and(...$expressions);
@@ -145,7 +145,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
     private function mapType(Filter $filter): ?int
     {
         if (FilterOperator::IN === $filter->operator() || FilterOperator::NOT_IN === $filter->operator()) {
-            return Connection::PARAM_STR_ARRAY;
+            return ArrayParameterType::STRING;
         }
 
         return null;

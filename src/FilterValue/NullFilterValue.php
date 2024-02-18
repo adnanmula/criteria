@@ -2,7 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterValue;
 
-final class NullFilterValue implements FilterValue
+final class NullFilterValue implements FilterValueInterface
 {
     public function __construct() {}
 

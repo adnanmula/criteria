@@ -2,31 +2,26 @@
 
 namespace AdnanMula\Criteria;
 
-use AdnanMula\Criteria\Filter\Filters;
+use AdnanMula\Criteria\FilterGroup\FilterGroup;
 use AdnanMula\Criteria\Sorting\Sorting;
 
 final class Criteria
 {
     private ?Sorting $sorting;
-    private array $filters;
     private ?int $offset;
     private ?int $limit;
+    private array $filterGroups;
 
-    public function __construct(?Sorting $sorting, ?int $offset, ?int $limit, Filters ...$filters)
+    public function __construct(?int $offset, ?int $limit, ?Sorting $sorting, FilterGroup ...$filterGroups)
     {
         if (null !== $offset && null === $sorting) {
             throw new \InvalidArgumentException('Order by must be specified when using offset to avoid inconsistent results');
         }
 
-        $this->sorting = $sorting;
         $this->offset = $offset;
         $this->limit = $limit;
-        $this->filters = $filters;
-    }
-
-    public function sorting(): ?Sorting
-    {
-        return $this->sorting;
+        $this->sorting = $sorting;
+        $this->filterGroups = $filterGroups;
     }
 
     public function offset(): ?int
@@ -39,9 +34,14 @@ final class Criteria
         return $this->limit;
     }
 
-    /** @return array<Filters> */
-    public function filters(): array
+    public function sorting(): ?Sorting
     {
-        return $this->filters;
+        return $this->sorting;
+    }
+
+    /** @return array<FilterGroup> */
+    public function filterGroups(): array
+    {
+        return $this->filterGroups;
     }
 }

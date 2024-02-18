@@ -8,5 +8,5 @@ interface FilterFieldInterface
 
     public function value(): string;
 
-    public function setName(string $field): self;
+    public function setName(string $name): self;
 }
