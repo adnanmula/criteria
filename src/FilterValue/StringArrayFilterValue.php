@@ -2,7 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterValue;
 
-final class StringArrayFilterValue implements FilterValue
+final class StringArrayFilterValue implements FilterValueInterface
 {
     private readonly array $value;
 

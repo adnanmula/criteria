@@ -2,7 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterValue;
 
-final class StringFilterValue implements FilterValue
+final class StringFilterValue implements FilterValueInterface
 {
     public function __construct(
         private readonly string $value,

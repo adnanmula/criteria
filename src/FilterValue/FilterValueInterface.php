@@ -2,7 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterValue;
 
-interface FilterValue
+interface FilterValueInterface
 {
     public function value(): mixed;
 }
