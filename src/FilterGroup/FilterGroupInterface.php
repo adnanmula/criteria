@@ -2,6 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterGroup;
 
+use AdnanMula\Criteria\Filter\Filter;
 use AdnanMula\Criteria\Filter\FilterType;
 
 interface FilterGroupInterface
@@ -10,6 +11,6 @@ interface FilterGroupInterface
 
     public function filtersGlue(): FilterType;
 
-    /** @return array<FilterGroup> */
+    /** @return array<Filter> */
     public function filters(): array;
 }

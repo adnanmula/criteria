@@ -16,7 +16,7 @@ abstract class FilterGroup implements FilterGroupInterface
         $this->filters = $filters;
     }
 
-    abstract function expressionType(): FilterType;
+    abstract public function expressionType(): FilterType;
 
     public function filtersGlue(): FilterType
     {

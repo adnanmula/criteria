@@ -15,4 +15,4 @@ grumphp:
             memory_limit: "256M"
 #        phpunit: ~
         phpversion:
-            project: '7.4'
+            project: '8.1'

@@ -61,6 +61,7 @@
     <exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint" />
     <exclude name="PSR1.Files.SideEffects.FoundWithSymbols" />
     <exclude name="SlevomatCodingStandard.Classes.PropertySpacing.IncorrectCountOfBlankLinesAfterProperty" />
+    <exclude name="SlevomatCodingStandard.TypeHints.DeclareStrictTypes" />
   </rule>
 
   <rule ref="Generic.Files.LineLength">

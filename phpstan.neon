@@ -4,3 +4,8 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     paths:
         -   src
+    ignoreErrors:
+        -
+            message: '#Unreachable statement - code above always terminates.#'
+            paths:
+                - src/DbalCriteriaAdapter.php
