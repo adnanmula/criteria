@@ -16,6 +16,8 @@ composer require adnanmula/criteria
 //Use the criteria class to build queries
 
 $criteria = new Criteria(
+    10, //Offset
+    20, //Limit
     new Sorting(
         new Order(
             new FilterField('name'),
@@ -26,17 +28,13 @@ $criteria = new Criteria(
             OrderType::DESC,
         ),
     ),
-    10, //Offset
-    20, //Limit
-    new Filters(
-        FilterType::AND,
+    new AndFilterGroup(
         FilterType::OR,
         new Filter(new FilterField('id'), new StringFilterValue('id'), FilterOperator::EQUAL),
         new Filter(new FilterField('field'), new StringArrayFilterValue('value1', 'value2', 'value3'), FilterOperator::IN),
         ...$moreFilters
     ),
-    new Filters(
-        FilterType::OR,
+    new OrFilterGroup(
         FilterType::AND,
         new Filter(new FilterField('json_field'), new ArrayElementFilterValue('value'), FilterOperator::IN_ARRAY),
         new Filter(new FilterField('amount'), new IntFilterValue(3), FilterOperator::LESS_OR_EQUAL),
