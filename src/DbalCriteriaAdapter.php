@@ -33,7 +33,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
     {
         foreach ($criteria->filterGroups() as $filter) {
             $expressions = \array_map(
-                fn(Filter $expression) => $this->buildExpression($expression),
+                fn (Filter $expression) => $this->buildExpression($expression),
                 $filter->filters(),
             );
 
