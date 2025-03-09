@@ -1,9 +1,4 @@
 parameters:
     level: 9
     paths:
-        -   src
-    ignoreErrors:
-        -
-            identifier: missingType.iterableValue
-            paths:
-                - tests/*
+        - src
