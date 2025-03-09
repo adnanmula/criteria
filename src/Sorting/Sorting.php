@@ -4,6 +4,7 @@ namespace AdnanMula\Criteria\Sorting;
 
 final class Sorting
 {
+    /** @var array<Order> */
     private readonly array $order;
 
     public function __construct(Order ...$order)

@@ -7,3 +7,18 @@ services:
     volumes:
       - .:/var/app
       - ~/.composer:/.composer
+    networks:
+      - network_criteria
+
+  postgres:
+    image: postgres:11.1-alpine
+    ports:
+      - ${DATABASE_PORT}:5432
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    networks:
+      - network_criteria
+
+networks:
+  network_criteria:
+    driver: bridge

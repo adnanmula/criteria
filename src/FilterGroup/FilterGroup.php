@@ -8,6 +8,8 @@ use AdnanMula\Criteria\Filter\FilterType;
 abstract class FilterGroup implements FilterGroupInterface
 {
     private readonly FilterType $filtersGlue;
+
+    /** @var array<Filter> */
     private readonly array $filters;
 
     public function __construct(FilterType $filtersGlue, Filter ...$filters)

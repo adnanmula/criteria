@@ -1,11 +1,9 @@
 parameters:
-    level: 8
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+    level: 9
     paths:
         -   src
     ignoreErrors:
         -
-            message: '#Unreachable statement - code above always terminates.#'
+            identifier: missingType.iterableValue
             paths:
-                - src/DbalCriteriaAdapter.php
+                - tests/*

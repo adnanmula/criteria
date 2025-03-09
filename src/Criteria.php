@@ -7,9 +7,10 @@ use AdnanMula\Criteria\Sorting\Sorting;
 
 final class Criteria
 {
-    private ?Sorting $sorting;
     private ?int $offset;
     private ?int $limit;
+    private ?Sorting $sorting;
+    /** @var array<FilterGroup> */
     private array $filterGroups;
 
     public function __construct(?int $offset, ?int $limit, ?Sorting $sorting, FilterGroup ...$filterGroups)
@@ -22,6 +23,11 @@ final class Criteria
         $this->limit = $limit;
         $this->sorting = $sorting;
         $this->filterGroups = $filterGroups;
+    }
+
+    public function withoutPagination(): self
+    {
+        return new self(null, null, $this->sorting, ...$this->filterGroups);
     }
 
     public function offset(): ?int

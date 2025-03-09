@@ -1,3 +1,3 @@
 #!/bin/bash
-docker-compose run --user=${UID} --no-deps --rm php sh -c "php vendor/bin/grumphp git:pre-commit" 2>&1
+docker compose run --user=${UID} --no-deps -T --rm php sh -c "php vendor/bin/grumphp git:pre-commit" 2>&1
 exit $?

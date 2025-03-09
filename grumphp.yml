@@ -13,6 +13,6 @@ grumphp:
         phpstan:
             autoload_file: phpstan.neon
             memory_limit: "256M"
-#        phpunit: ~
+        phpunit: ~
         phpversion:
             project: '8.1'

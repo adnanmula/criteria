@@ -12,9 +12,11 @@ use Doctrine\DBAL\Query\QueryBuilder;
 final class DbalCriteriaAdapter implements CriteriaAdapter
 {
     private QueryBuilder $queryBuilder;
+    /** @var array<string, string> */
     private readonly array $fieldMapping;
     private int $parameterIndex;
 
+    /** @param array<string, string> $fieldMapping */
     public function __construct(QueryBuilder $queryBuilder, array $fieldMapping = [])
     {
         $this->queryBuilder = $queryBuilder;
@@ -126,9 +128,9 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
                 return $field . '::jsonb @> ' . $value . '::jsonb';
             case FilterOperator::NOT_IN_ARRAY:
                 return 'not ' . $field . '::jsonb @> ' . $value . '::jsonb';
+            default:
+                throw new \InvalidArgumentException('Invalid operator');
         }
-
-        throw new \InvalidArgumentException('Invalid operator');
     }
 
     private function mapParameterValue(Filter $filter): mixed

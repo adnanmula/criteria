@@ -2,10 +2,13 @@ FROM php:8.2-fpm-alpine
 
 RUN apk update && apk add --no-cache \
     oniguruma-dev \
+    postgresql-dev \
     git \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
-        mbstring
+        mbstring \
+        pdo \
+        pdo_pgsql
 
 RUN mkdir /.composer \
     && chown -R www-data:www-data /.composer
