@@ -249,6 +249,46 @@ class RepositoryTest extends TestCase
         self::assertCount(99, $result);
     }
 
+    public function testPaginationWithoutSorting(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->search(new Criteria(1, 4, null));
+    }
+
+    public function testWithoutPagination(): void
+    {
+        $c = new Criteria(
+            1,
+            4,
+            new Sorting(new Order(new FilterField('id'), OrderType::ASC)),
+        );
+
+        $result = $this->search($c->withoutPagination());
+
+        self::assertCount(100, $result);
+    }
+
+    public function testAddOneMoreFilter(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+        );
+
+        $c = $c->with(
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+            ),
+        );
+
+        $result = $this->search($c->withoutPagination());
+
+        self::assertCount(1, $result);
+    }
+
     public static function dataFilterInJsonArray(): array
     {
         return [

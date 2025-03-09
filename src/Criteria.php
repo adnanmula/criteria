@@ -30,6 +30,17 @@ final class Criteria
         return new self(null, null, $this->sorting, ...$this->filterGroups);
     }
 
+    public function with(FilterGroup $group): self
+    {
+        return new self(
+            $this->offset,
+            $this->limit,
+            $this->sorting,
+            $group,
+            ...$this->filterGroups,
+        );
+    }
+
     public function offset(): ?int
     {
         return $this->offset;

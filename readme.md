@@ -46,7 +46,9 @@ $criteria = new Criteria(
 ```php
 //Example of repository
 
-$query = $this->connection->createQueryBuilder()->select('a.fields')
+$builder = $this->connection->createQueryBuilder();
+
+$query = $builder->select('a.fields')
     ->from('table', 'a');
 
 (new DbalCriteriaAdapter($builder))->execute($criteria);
