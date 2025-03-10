@@ -269,18 +269,67 @@ class RepositoryTest extends TestCase
         self::assertCount(100, $result);
     }
 
-    public function testAddOneMoreFilter(): void
+    public function testWithoutSorting(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
+            0,
+            10,
+            new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
         );
+
+        $result = $this->search($c->withoutPaginationAndSorting());
+
+        self::assertCount(100, $result);
+        self::assertEquals(1, $result[0]['id']);
+    }
+
+    public function testWithoutFilters(): void
+    {
+        $c = new Criteria(
+            0,
+            10,
+            new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+            ),
+        );
+
+        $result = $this->search($c->withoutFilters());
+
+        self::assertCount(10, $result);
+        self::assertEquals(100, $result[0]['id']);
+    }
+
+    public function testAddOneMoreFilter(): void
+    {
+        $c = new Criteria(null, null, null);
 
         $c = $c->with(
             new AndFilterGroup(
                 FilterType::AND,
                 new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+            ),
+        );
+
+        $result = $this->search($c->withoutPagination());
+
+        self::assertCount(1, $result);
+    }
+
+    public function testAddOneTwoFilters(): void
+    {
+        $c = new Criteria(null, null, null);
+
+        $c = $c->with(
+            new AndFilterGroup(
+                FilterType::OR,
+                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+                new Filter(new FilterField('id'), new IntFilterValue(40), FilterOperator::EQUAL),
+            ),
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(new FilterField('id'), new IntFilterValue(30), FilterOperator::GREATER),
             ),
         );
 
