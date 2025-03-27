@@ -115,7 +115,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
             case FilterOperator::NOT_CONTAINS:
                 return $this->queryBuilder->expr()->notLike($field, $value);
             case FilterOperator::NOT_CONTAINS_INSENSITIVE:
-                return $field . ' not ilike ' . $field;
+                return $field . ' not ilike ' . $value;
             case FilterOperator::IN:
                 return $this->queryBuilder->expr()->in($field, $value);
             case FilterOperator::NOT_IN:

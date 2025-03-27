@@ -3,6 +3,7 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     paths:
         - src
+        - tests
     ignoreErrors:
         -
             identifier: missingType.iterableValue

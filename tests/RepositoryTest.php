@@ -16,6 +16,7 @@ use AdnanMula\Criteria\FilterValue\StringFilterValue;
 use AdnanMula\Criteria\Sorting\Order;
 use AdnanMula\Criteria\Sorting\OrderType;
 use AdnanMula\Criteria\Sorting\Sorting;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
@@ -176,7 +177,16 @@ class RepositoryTest extends TestCase
         self::assertCount(2, $result);
     }
 
-    public function testFilterNotContains(): void
+    public static function dataFilterNotContains(): array
+    {
+        return [
+            ['imnotrandom', 98],
+            ['imnotRANDOM', 100],
+        ];
+    }
+
+    #[DataProvider('dataFilterNotContains')]
+    public function testFilterNotContains(string $string, int $count): void
     {
         $c = new Criteria(
             null,
@@ -186,7 +196,7 @@ class RepositoryTest extends TestCase
                 FilterType::OR,
                 new Filter(
                     new FilterField('random_string_or_null'),
-                    new StringFilterValue('imnotrandom'),
+                    new StringFilterValue($string),
                     FilterOperator::NOT_CONTAINS,
                 ),
                 new Filter(
@@ -199,7 +209,42 @@ class RepositoryTest extends TestCase
 
         $result = $this->search($c);
 
-        self::assertCount(98, $result);
+        self::assertCount($count, $result);
+    }
+
+    public static function dataFilterNotContainsInsensitive(): array
+    {
+        return [
+            ['imnotrandom', 98],
+            ['imnotRANDOM', 98],
+        ];
+    }
+
+    #[DataProvider('dataFilterNotContainsInsensitive')]
+    public function testFilterNotContainsInsensitive(string $string, int $count): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::OR,
+                new Filter(
+                    new FilterField('random_string_or_null'),
+                    new StringFilterValue($string),
+                    FilterOperator::NOT_CONTAINS_INSENSITIVE,
+                ),
+                new Filter(
+                    new FilterField('random_string_or_null'),
+                    new NullFilterValue(),
+                    FilterOperator::IS_NULL,
+                ),
+            ),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount($count, $result);
     }
 
     public function testFilterInArray(): void
@@ -348,7 +393,7 @@ class RepositoryTest extends TestCase
         ];
     }
 
-    /** @dataProvider dataFilterInJsonArray */
+    #[DataProvider('dataFilterInJsonArray')]
     public function testFilterInJsonArray(string $key, int $expected): void
     {
         $c = new Criteria(
@@ -380,7 +425,7 @@ class RepositoryTest extends TestCase
         ];
     }
 
-    /** @dataProvider dataFilterNotInJsonArray */
+    #[DataProvider('dataFilterNotInJsonArray')]
     public function testFilterNotInJsonArray(string $key, int $expected): void
     {
         $c = new Criteria(
