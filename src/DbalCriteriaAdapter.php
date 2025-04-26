@@ -7,6 +7,7 @@ use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterFieldInterface;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 final class DbalCriteriaAdapter implements CriteriaAdapter
@@ -144,13 +145,13 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
         return $filter->value()->value();
     }
 
-    private function mapType(Filter $filter): ?int
+    private function mapType(Filter $filter): int
     {
         if (FilterOperator::IN === $filter->operator() || FilterOperator::NOT_IN === $filter->operator()) {
             return ArrayParameterType::STRING;
         }
 
-        return null;
+        return ParameterType::STRING;
     }
 
     private function mapField(FilterFieldInterface $field): string
