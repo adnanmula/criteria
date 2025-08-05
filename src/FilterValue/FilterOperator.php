@@ -21,7 +21,7 @@ enum FilterOperator
     case IN_ARRAY;
     case NOT_IN_ARRAY;
 
-    public function isComparisonOperator(): bool
+    public function isComparison(): bool
     {
         return $this === self::EQUAL
             || $this === self::NOT_EQUAL
@@ -31,13 +31,13 @@ enum FilterOperator
             || $this === self::LESS_OR_EQUAL;
     }
 
-    public function isInOperator(): bool
+    public function isCollection(): bool
     {
         return $this === self::IN
             || $this === self::NOT_IN;
     }
 
-    public function isContainsOperator(): bool
+    public function isTextSearch(): bool
     {
         return $this === self::CONTAINS
             || $this === self::CONTAINS_INSENSITIVE
@@ -45,9 +45,15 @@ enum FilterOperator
             || $this === self::NOT_CONTAINS_INSENSITIVE;
     }
 
-    public function isNullOperator(): bool
+    public function isNullCheck(): bool
     {
         return $this === self::IS_NULL
             || $this === self::IS_NOT_NULL;
+    }
+
+    public function isJsonArrayOperation(): bool
+    {
+        return $this === self::IN_ARRAY
+            || $this === self::NOT_IN_ARRAY;
     }
 }

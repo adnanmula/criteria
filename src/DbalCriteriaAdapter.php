@@ -89,7 +89,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
         $parameterName = \str_replace('.', '', $filter->field()->name()) . $this->parameterIndex;
 
-        if (false === $filter->operator()->isNullOperator()) {
+        if (false === $filter->operator()->isNullCheck()) {
             $this->queryBuilder->setParameter(
                 $parameterName,
                 $this->mapParameterValue($filter),
@@ -141,7 +141,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
             return ArrayParameterType::STRING;
         }
 
-        if ($filter->operator()->isNullOperator()) {
+        if ($filter->operator()->isNullCheck()) {
             return ParameterType::NULL;
         }
 
