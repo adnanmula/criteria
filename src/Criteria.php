@@ -16,6 +16,18 @@ final class Criteria
         private readonly ?Sorting $sorting,
         FilterGroup ...$filterGroups,
     ) {
+        if (null !== $offset) {
+            if (0 > $offset) {
+                throw new \InvalidArgumentException('Invalid offset');
+            }
+        }
+
+        if (null !== $limit) {
+            if (0 >= $limit) {
+                throw new \InvalidArgumentException('Invalid limit');
+            }
+        }
+
         if (null !== $offset && null === $sorting) {
             throw new \InvalidArgumentException('Order by must be specified when using offset to avoid inconsistent results');
         }
