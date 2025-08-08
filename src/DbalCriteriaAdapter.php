@@ -8,22 +8,20 @@ use AdnanMula\Criteria\FilterField\FilterFieldInterface;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
+use AdnanMula\Criteria\FilterValue\StringFilterValue;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 final class DbalCriteriaAdapter implements CriteriaAdapter
 {
-    private QueryBuilder $queryBuilder;
-    /** @var array<string, string> */
-    private readonly array $fieldMapping;
     private int $parameterIndex;
 
     /** @param array<string, string> $fieldMapping */
-    public function __construct(QueryBuilder $queryBuilder, array $fieldMapping = [])
-    {
-        $this->queryBuilder = $queryBuilder;
-        $this->fieldMapping = $fieldMapping;
+    public function __construct(
+        private readonly QueryBuilder $queryBuilder,
+        private readonly array $fieldMapping = [],
+    ) {
         $this->parameterIndex = 0;
     }
 
@@ -85,7 +83,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
     private function buildExpression(Filter $filter): string
     {
-        $this->parameterIndex++;
+        ++$this->parameterIndex;
 
         $parameterName = \str_replace('.', '', $filter->field()->name()) . $this->parameterIndex;
 
@@ -125,6 +123,10 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
         $containOperators = [FilterOperator::CONTAINS, FilterOperator::CONTAINS_INSENSITIVE, FilterOperator::NOT_CONTAINS, FilterOperator::NOT_CONTAINS_INSENSITIVE];
 
         if (in_array($filter->operator(), $containOperators, true)) {
+            if (false === $filter->value() instanceof StringFilterValue) {
+                throw new \InvalidArgumentException('Text search operators mush use StringFilterValue');
+            }
+
             return '%' . $filter->value()->value() . '%';
         }
 

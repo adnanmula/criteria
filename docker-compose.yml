@@ -1,6 +1,6 @@
 services:
   php:
-    build: .
+    build: docker
     working_dir: /var/app
     volumes:
       - .:/var/app

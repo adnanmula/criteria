@@ -21,7 +21,7 @@ trait DbConnectionTrait
 
     private static function connectionParams(): array
     {
-        /** @var array<int, string> $envFile */
+        /** @var list<string> $envFile */
         $envFile = \file(
             \dirname(__DIR__) . '/.env',
             \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES,

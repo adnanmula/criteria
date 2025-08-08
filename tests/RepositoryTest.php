@@ -58,7 +58,7 @@ class RepositoryTest extends TestCase
 
         foreach ($result as $row) {
             self::assertEquals($currentId, $row['id']);
-            $currentId++;
+            ++$currentId;
         }
     }
 
@@ -83,7 +83,7 @@ class RepositoryTest extends TestCase
 
         foreach ($result as $row) {
             self::assertEquals($currentId, $row['id']);
-            $currentId--;
+            --$currentId;
         }
     }
 
