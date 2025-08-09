@@ -682,4 +682,56 @@ class RepositoryTest extends TestCase
 
         self::assertCount(1, $result);
     }
+
+    public function testFilterWithFieldMappingInJsonField(): void
+    {
+        $fieldMapping = [
+            'domainName' => 'dictionary_of_strings',
+        ];
+
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('domainName', "key1"),
+                    new StringFilterValue('value1'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c, $fieldMapping);
+
+        self::assertCount(2, $result);
+    }
+
+    public function testFilterWithFieldMappingInJsonFieldAndOrderBy(): void
+    {
+        $fieldMapping = [
+            'domainName' => 'dictionary_of_strings',
+        ];
+
+        $c = new Criteria(
+            null,
+            null,
+            new Sorting(new Order(new FilterField('domainName'), OrderType::DESC)),
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('domainName', "key1"),
+                    new StringFilterValue('value1'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c, $fieldMapping);
+
+        self::assertCount(2, $result);
+    }
 }

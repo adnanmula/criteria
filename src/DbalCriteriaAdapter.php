@@ -5,6 +5,7 @@ namespace AdnanMula\Criteria;
 use AdnanMula\Criteria\Filter\Filter;
 use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterFieldInterface;
+use AdnanMula\Criteria\FilterField\JsonKeyFilterField;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
@@ -154,10 +155,20 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
     private function mapField(FilterFieldInterface $field): string
     {
+        $name = $field->name();
+
         if (\array_key_exists($field->name(), $this->fieldMapping)) {
-            $field->setName($this->fieldMapping[$field->name()]);
+            $name = $this->fieldMapping[$field->name()];
         }
 
-        return $field->value();
+        if ($field instanceof JsonKeyFilterField) {
+            if (\is_string($field->index())) {
+                return $name . '->>\'' . $field->index() . '\'';
+            }
+
+            return $name . '->>' . $field->index();
+        }
+
+        return $name;
     }
 }

@@ -5,8 +5,4 @@ namespace AdnanMula\Criteria\FilterField;
 interface FilterFieldInterface
 {
     public function name(): string;
-
-    public function value(): string;
-
-    public function setName(string $name): self;
 }

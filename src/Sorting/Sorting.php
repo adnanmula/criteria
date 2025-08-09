@@ -21,7 +21,7 @@ final class Sorting
     public function has(string $field): bool
     {
         foreach ($this->order as $order) {
-            if ($order->field()->value() === $field) {
+            if ($order->field()->name() === $field) {
                 return true;
             }
         }
@@ -32,7 +32,7 @@ final class Sorting
     public function get(string $field): ?Order
     {
         foreach ($this->order as $order) {
-            if ($order->field()->value() === $field) {
+            if ($order->field()->name() === $field) {
                 return $order;
             }
         }

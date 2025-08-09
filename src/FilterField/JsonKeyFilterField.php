@@ -14,19 +14,8 @@ class JsonKeyFilterField implements FilterFieldInterface
         return $this->name;
     }
 
-    public function value(): string
+    public function index(): int|string
     {
-        if (\is_string($this->index)) {
-            return $this->name . '->>\'' . $this->index . '\'';
-        }
-
-        return $this->name . '->>' . $this->index;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
+        return $this->index;
     }
 }

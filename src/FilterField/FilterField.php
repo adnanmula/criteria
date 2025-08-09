@@ -12,16 +12,4 @@ final class FilterField implements FilterFieldInterface
     {
         return $this->name;
     }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function value(): string
-    {
-        return $this->name;
-    }
 }
