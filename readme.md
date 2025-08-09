@@ -1,6 +1,6 @@
 # Criteria
 
-[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-8892BF.svg)](https://www.php.net/)
+[![PHP Version](https://img.shields.io/badge/PHP-%3E=8.4-777BB4.svg)](https://www.php.net/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A powerful PHP library for building dynamic database queries with a fluent interface, specifically optimized for PostgreSQL.
@@ -10,16 +10,16 @@ A powerful PHP library for building dynamic database queries with a fluent inter
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Creating a Criteria Object](#creating-a-criteria-object)
-  - [Using with Doctrine DBAL](#using-with-doctrine-dbal)
-  - [Filter Operators](#filter-operators)
-  - [Filter Fields](#filter-fields)
-  - [Filter Values](#filter-values)
+    - [Creating a Criteria Object](#creating-a-criteria-object)
+    - [Using with Doctrine DBAL](#using-with-doctrine-dbal)
+    - [Filter Operators](#filter-operators)
+    - [Filter Fields](#filter-fields)
+    - [Filter Values](#filter-values)
 - [License](#license)
 
 ## Requirements
 
-- PHP 8.1 or higher
+- PHP 8.4 or higher
 - Doctrine DBAL 3.5 or higher
 
 ## Installation
