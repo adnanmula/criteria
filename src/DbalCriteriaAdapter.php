@@ -4,8 +4,7 @@ namespace AdnanMula\Criteria;
 
 use AdnanMula\Criteria\Filter\Filter;
 use AdnanMula\Criteria\Filter\FilterType;
-use AdnanMula\Criteria\FilterField\FilterFieldInterface;
-use AdnanMula\Criteria\FilterField\JsonKeyFilterField;
+use AdnanMula\Criteria\FilterField\FieldMapping;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
@@ -18,10 +17,9 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 {
     private int $parameterIndex;
 
-    /** @param array<string, string> $fieldMapping */
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
-        private readonly array $fieldMapping = [],
+        private readonly FieldMapping $fieldMapping = new FieldMapping(),
     ) {
         $this->parameterIndex = 0;
     }
@@ -64,7 +62,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
         if (null !== $criteria->sorting()) {
             foreach ($criteria->sorting()->order() as $order) {
                 $this->queryBuilder->addOrderBy(
-                    $this->mapField($order->field()),
+                    $order->field()->value($this->fieldMapping),
                     $order->type()->name,
                 );
             }
@@ -94,7 +92,7 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
             $this->mapType($filter),
         );
 
-        $field = $this->mapField($filter->field());
+        $field = $filter->field()->value($this->fieldMapping);
         $value = ':' . $parameterName;
 
         return match ($filter->operator()) {
@@ -151,24 +149,5 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
         }
 
         return ParameterType::STRING;
-    }
-
-    private function mapField(FilterFieldInterface $field): string
-    {
-        $name = $field->name();
-
-        if (\array_key_exists($field->name(), $this->fieldMapping)) {
-            $name = $this->fieldMapping[$field->name()];
-        }
-
-        if ($field instanceof JsonKeyFilterField) {
-            if (\is_string($field->index())) {
-                return $name . '->>\'' . $field->index() . '\'';
-            }
-
-            return $name . '->>' . $field->index();
-        }
-
-        return $name;
     }
 }

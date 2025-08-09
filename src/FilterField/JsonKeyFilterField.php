@@ -2,11 +2,11 @@
 
 namespace AdnanMula\Criteria\FilterField;
 
-class JsonKeyFilterField implements FilterFieldInterface
+final readonly class JsonKeyFilterField implements FilterFieldInterface
 {
     public function __construct(
         private string $name,
-        private readonly int|string $index,
+        private int|string $index,
     ) {}
 
     public function name(): string
@@ -14,8 +14,19 @@ class JsonKeyFilterField implements FilterFieldInterface
         return $this->name;
     }
 
-    public function index(): int|string
+    public function value(FieldMapping $mapping = new FieldMapping()): string
     {
-        return $this->index;
+        $name = $this->name;
+
+        if ($mapping->has($name)) {
+            /** @var string $name */
+            $name = $mapping->get($name);
+        }
+
+        if (\is_string($this->index)) {
+            return $name . '->>\'' . $this->index . '\'';
+        }
+
+        return $name . '->>' . $this->index;
     }
 }

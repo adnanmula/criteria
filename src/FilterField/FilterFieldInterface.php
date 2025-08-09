@@ -5,4 +5,5 @@ namespace AdnanMula\Criteria\FilterField;
 interface FilterFieldInterface
 {
     public function name(): string;
+    public function value(FieldMapping $mapping): string;
 }

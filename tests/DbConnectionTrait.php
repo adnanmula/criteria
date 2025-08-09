@@ -4,6 +4,7 @@ namespace AdnanMula\Criteria\Tests;
 
 use AdnanMula\Criteria\Criteria;
 use AdnanMula\Criteria\DbalCriteriaAdapter;
+use AdnanMula\Criteria\FilterField\FieldMapping;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 
@@ -98,14 +99,14 @@ trait DbConnectionTrait
         }
     }
 
-    private function search(Criteria $criteria, array $fieldMapping = []): array
+    private function search(Criteria $criteria, array $mapper = []): array
     {
         $builder = self::$connection->createQueryBuilder();
 
         $query = $builder->select('a.*')
             ->from(self::$table, 'a');
 
-        new DbalCriteriaAdapter($builder, $fieldMapping)->execute($criteria);
+        new DbalCriteriaAdapter($builder, new FieldMapping($mapper))->execute($criteria);
 
         return $query->executeQuery()->fetchAllAssociative();
     }

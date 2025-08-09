@@ -2,7 +2,7 @@
 
 namespace AdnanMula\Criteria\FilterField;
 
-final class FilterField implements FilterFieldInterface
+final readonly class FilterField implements FilterFieldInterface
 {
     public function __construct(
         private string $name,
@@ -11,5 +11,10 @@ final class FilterField implements FilterFieldInterface
     public function name(): string
     {
         return $this->name;
+    }
+
+    public function value(FieldMapping $mapping = new FieldMapping()): string
+    {
+        return $mapping->get($this->name) ?? $this->name;
     }
 }
