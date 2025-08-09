@@ -37,12 +37,16 @@ final class HelperFunctionsTest extends TestCase
     public static function dataInvalidCriteria(): array
     {
         return [
-            [-1, null],
-            [null, -1],
-            [-1, -1],
             [10, 0],
+            [4, 4],
+            [-1, -1],
             [1, null],
+            [0, null],
+            [-1, null],
+            [-10, null],
             [null, 0],
+            [null, -1],
+            [null, -15],
         ];
     }
 
