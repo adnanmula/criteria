@@ -6,9 +6,12 @@ use AdnanMula\Criteria\Criteria;
 use AdnanMula\Criteria\Filter\Filter;
 use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterField;
+use AdnanMula\Criteria\FilterField\JsonKeyFilterField;
 use AdnanMula\Criteria\FilterGroup\AndFilterGroup;
+use AdnanMula\Criteria\FilterGroup\OrFilterGroup;
 use AdnanMula\Criteria\FilterValue\ArrayElementFilterValue;
 use AdnanMula\Criteria\FilterValue\FilterOperator;
+use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
 use AdnanMula\Criteria\FilterValue\NullFilterValue;
 use AdnanMula\Criteria\FilterValue\StringArrayFilterValue;
@@ -274,7 +277,7 @@ class RepositoryTest extends TestCase
             null,
             null,
             null,
-            new AndFilterGroup(
+            new OrFilterGroup(
                 FilterType::OR,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -292,6 +295,48 @@ class RepositoryTest extends TestCase
         $result = $this->search($c);
 
         self::assertCount(99, $result);
+    }
+
+    public function testFilterIntInArray(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new FilterField('id'),
+                    new IntArrayFilterValue(1, 2, 3),
+                    FilterOperator::IN,
+                ),
+            ),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(3, $result);
+    }
+
+    public function testFilterIntNotInArray(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::OR,
+                new Filter(
+                    new FilterField('id'),
+                    new IntArrayFilterValue(1, 2, 3),
+                    FilterOperator::NOT_IN,
+                ),
+            ),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(97, $result);
     }
 
     public function testPaginationWithoutSorting(): void
@@ -445,5 +490,196 @@ class RepositoryTest extends TestCase
         $result = $this->search($c);
 
         self::assertCount($expected, $result);
+    }
+
+    public function testFilterJsonIntKeyEquals(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('array_of_strings', 1),
+                    new StringFilterValue('bbb'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(2, $result);
+    }
+
+    public function testFilterJsonIntKeyEquals2(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('array_of_strings', 0),
+                    new StringFilterValue('bbb'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(0, $result);
+    }
+
+    public function testFilterJsonStringKeyEquals(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('dictionary_of_strings', "key1"),
+                    new StringFilterValue('value1'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(2, $result);
+    }
+
+    public function testFilterJsonStringKeyEquals2(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('dictionary_of_strings', "not_exists"),
+                    new StringFilterValue('value1'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(0, $result);
+    }
+
+    public function testFilterJsonStringKeyEquals3(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new JsonKeyFilterField('dictionary_of_strings', "key2"),
+                    new StringFilterValue('wrong_value'),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(0, $result);
+    }
+
+    public function testFilterGroupIsEmpty(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(FilterType::AND),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+    }
+
+    public function testFilterGroupsAreEmpty(): void
+    {
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(FilterType::AND),
+            new AndFilterGroup(FilterType::AND),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+    }
+
+    public function testTextSearchOperatorWithoutStringFilterValue(): void
+    {
+        self::expectException(\InvalidArgumentException::class);
+
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new FilterField('random_string_or_null'),
+                    new IntFilterValue(4),
+                    FilterOperator::CONTAINS,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+    }
+
+    public function testFilterWithFieldMapping(): void
+    {
+        $fieldMapping = [
+            'domainName' => 'id',
+        ];
+
+        $c = new Criteria(
+            null,
+            null,
+            null,
+            new AndFilterGroup(
+                FilterType::AND,
+                new Filter(
+                    new FilterField('domainName'),
+                    new IntFilterValue(1),
+                    FilterOperator::EQUAL,
+                ),
+            ),
+        );
+
+
+        $result = $this->search($c, $fieldMapping);
+
+        self::assertCount(1, $result);
     }
 }

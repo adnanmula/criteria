@@ -16,11 +16,11 @@ class JsonKeyFilterField implements FilterFieldInterface
 
     public function value(): string
     {
-        if (\is_int($this->index)) {
-            return $this->name . '->>' . $this->index;
+        if (\is_string($this->index)) {
+            return $this->name . '->>\'' . $this->index . '\'';
         }
 
-        return $this->name . '->\'' . $this->index . '\'';
+        return $this->name . '->>' . $this->index;
     }
 
     public function setName(string $name): self

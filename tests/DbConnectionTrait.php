@@ -57,6 +57,7 @@ trait DbConnectionTrait
                 always_null character varying(128) null,
                 random_numbers int,
                 array_of_strings jsonb null,
+                dictionary_of_strings jsonb null,
                 primary key(id)
             )',
             self::$table,
@@ -68,15 +69,18 @@ trait DbConnectionTrait
         for ($i = 1; $i < 101; ++$i) {
             $randomString = \random_int(0, 2) === 0 ? null : \bin2hex(\random_bytes(\random_int(5, 15)));
             $json = null;
+            $dictionary = null;
 
             if ($i === 1) {
                 $randomString = null;
                 $json = '["aaa", "bbb"]';
+                $dictionary = '{"key1":"value1","key2":"value2","key3":"value3"}';
             }
 
             if ($i === 2) {
                 $randomString = 'imnotrandom';
                 $json = '["aaa", "bbb", "ccc"]';
+                $dictionary = '{"key1":"value1","key2":"value2"}';
             }
 
             if ($i === 3) {
@@ -89,18 +93,19 @@ trait DbConnectionTrait
                 'always_null' => null,
                 'random_numbers' => \random_int(0, 10000),
                 'array_of_strings' => $json,
+                'dictionary_of_strings' => $dictionary,
             ]);
         }
     }
 
-    private function search(Criteria $criteria): array
+    private function search(Criteria $criteria, array $fieldMapping = []): array
     {
         $builder = self::$connection->createQueryBuilder();
 
         $query = $builder->select('a.*')
             ->from(self::$table, 'a');
 
-        (new DbalCriteriaAdapter($builder))->execute($criteria);
+        new DbalCriteriaAdapter($builder, $fieldMapping)->execute($criteria);
 
         return $query->executeQuery()->fetchAllAssociative();
     }

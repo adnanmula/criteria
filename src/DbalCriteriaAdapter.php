@@ -87,13 +87,11 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
         $parameterName = \str_replace('.', '', $filter->field()->name()) . $this->parameterIndex;
 
-        if (false === $filter->operator()->isNullCheck()) {
-            $this->queryBuilder->setParameter(
-                $parameterName,
-                $this->mapParameterValue($filter),
-                $this->mapType($filter),
-            );
-        }
+        $this->queryBuilder->setParameter(
+            $parameterName,
+            $this->mapParameterValue($filter),
+            $this->mapType($filter),
+        );
 
         $field = $this->mapField($filter->field());
         $value = ':' . $parameterName;
