@@ -3,83 +3,103 @@
 namespace AdnanMula\Criteria\Tests;
 
 use AdnanMula\Criteria\Criteria;
+use AdnanMula\Criteria\Filter\CompositeFilter;
+use AdnanMula\Criteria\Filter\Filter;
+use AdnanMula\Criteria\Filter\Filters;
+use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterField;
+use AdnanMula\Criteria\FilterValue\FilterOperator;
+use AdnanMula\Criteria\FilterValue\IntFilterValue;
 use AdnanMula\Criteria\Sorting\Order;
 use AdnanMula\Criteria\Sorting\OrderType;
 use AdnanMula\Criteria\Sorting\Sorting;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class HelperFunctionsTest extends TestCase
 {
-    public function testOrderAsc(): void
+    use DbConnectionTrait;
+
+    public static function setUpBeforeClass(): void
     {
-        $s = new Sorting(
-            new Order(
-                new FilterField('id'),
-                OrderType::ASC,
+        self::setUpDb();
+    }
+
+    public function testWithoutSorting(): void
+    {
+        $c = new Criteria(
+            offset: 0,
+            limit: 10,
+            sorting: new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
+        );
+
+        $result = $this->search($c->withoutPaginationAndSorting());
+
+        self::assertCount(100, $result);
+        self::assertEquals(1, $result[0]['id']);
+    }
+
+    public function testWithoutPagination(): void
+    {
+        $c = new Criteria(
+            offset: 1,
+            limit: 4,
+            sorting: new Sorting(new Order(new FilterField('id'), OrderType::ASC)),
+        );
+
+        $result = $this->search($c->withoutPagination());
+
+        self::assertCount(100, $result);
+    }
+
+    public function testWithoutFilters(): void
+    {
+        $c = new Criteria(
+            new Filters(
+                FilterType::AND,
+                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
             ),
-            new Order(
-                new FilterField('field1'),
-                OrderType::DESC,
+            0,
+            10,
+            new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
+        );
+
+        $result = $this->search($c->withoutFilters());
+
+        self::assertCount(10, $result);
+        self::assertEquals(100, $result[0]['id']);
+    }
+
+    public function testAddOneMoreFilter(): void
+    {
+        $c = new Criteria();
+
+        $c = $c->with(
+            new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+        );
+
+        $result = $this->search($c->withoutPagination());
+
+        self::assertCount(1, $result);
+    }
+
+    public function testAddOneTwoFilters(): void
+    {
+        $c = new Criteria();
+
+        $c = $c->with(
+            new CompositeFilter(
+                FilterType::AND,
+                new CompositeFilter(
+                    FilterType::OR,
+                    new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+                    new Filter(new FilterField('id'), new IntFilterValue(40), FilterOperator::EQUAL),
+                ),
+                new Filter(new FilterField('id'), new IntFilterValue(30), FilterOperator::GREATER),
             ),
         );
 
-        self::assertTrue($s->has('id'));
-        self::assertTrue($s->has('field1'));
-        self::assertFalse($s->has('field2'));
+        $result = $this->search($c->withoutPagination());
 
-        self::assertEquals($s->get('id')?->type(), OrderType::ASC);
-        self::assertEquals($s->get('field1')?->type(), OrderType::DESC);
-        self::assertNull($s->get('field2'));
-    }
-
-    public static function dataInvalidCriteria(): array
-    {
-        return [
-            [10, 0],
-            [4, 4],
-            [-1, -1],
-            [1, null],
-            [0, null],
-            [-1, null],
-            [-10, null],
-            [null, 0],
-            [null, -1],
-            [null, -15],
-        ];
-    }
-
-    #[DataProvider('dataInvalidCriteria')]
-    public function testInvalidCriteria(?int $offset, ?int $limit): void
-    {
-        self::expectException(\InvalidArgumentException::class);
-
-        new Criteria(offset: $offset, limit: $limit);
-    }
-
-    public static function dataValidCriteria(): array
-    {
-        return [
-            [1, 1, true],
-            [null, 1, true],
-            [1, null, true],
-            [0, null, true],
-            [null, null, false],
-            [null, 1, false],
-        ];
-    }
-
-    #[DataProvider('dataValidCriteria')]
-    public function testValidCriteria(?int $offset, ?int $limit, bool $withSorting): void
-    {
-        $sorting = $withSorting
-            ? new Sorting(new Order(new FilterField('id'), OrderType::ASC))
-            : null;
-
-        $c = new Criteria(offset: $offset, limit: $limit, sorting: $sorting);
-
-        self::assertEquals($offset, $c->offset());
-        self::assertEquals($limit, $c->limit());
+        self::assertCount(1, $result);
     }
 }

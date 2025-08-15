@@ -146,12 +146,8 @@ final class DbalCriteriaAdapter
 
     private function mapParameterValue(Filter $filter): mixed
     {
-        $containOperators = [FilterOperator::CONTAINS, FilterOperator::CONTAINS_INSENSITIVE, FilterOperator::NOT_CONTAINS, FilterOperator::NOT_CONTAINS_INSENSITIVE];
-
-        if (in_array($filter->operator(), $containOperators, true)) {
-            if (false === $filter->value() instanceof StringFilterValue) {
-                throw new \InvalidArgumentException('Text search operators must use StringFilterValue');
-            }
+        if ($filter->operator()->isTextSearch()) {
+            assert($filter->value() instanceof StringFilterValue);
 
             return '%' . $filter->value()->value() . '%';
         }
