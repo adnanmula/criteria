@@ -55,7 +55,7 @@ final class HelperFunctionsTest extends TestCase
     {
         self::expectException(\InvalidArgumentException::class);
 
-        new Criteria($offset, $limit, null);
+        new Criteria(offset: $offset, limit: $limit);
     }
 
     public static function dataValidCriteria(): array
@@ -77,7 +77,7 @@ final class HelperFunctionsTest extends TestCase
             ? new Sorting(new Order(new FilterField('id'), OrderType::ASC))
             : null;
 
-        $c = new Criteria($offset, $limit, $sorting);
+        $c = new Criteria(offset: $offset, limit: $limit, sorting: $sorting);
 
         self::assertEquals($offset, $c->offset());
         self::assertEquals($limit, $c->limit());
