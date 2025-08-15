@@ -4,7 +4,6 @@ namespace AdnanMula\Criteria\Filter;
 
 use AdnanMula\Criteria\FilterField\FilterFieldInterface;
 use AdnanMula\Criteria\FilterValue\ArrayElementFilterValue;
-use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\FilterValueInterface;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
