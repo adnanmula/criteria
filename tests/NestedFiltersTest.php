@@ -53,4 +53,62 @@ final class NestedFiltersTest extends TestCase
 
         self::assertGreaterThan(0, \count($result));
     }
+
+    public function testNestedCompositeFilters2(): void
+    {
+        $c = new Criteria(
+            new Filters(
+                FilterType::OR,
+                new Filter(new FilterField('id'), new IntFilterValue(1), FilterOperator::EQUAL),
+                new CompositeFilter(
+                    FilterType::OR,
+                    new Filter(new FilterField('id'), new IntFilterValue(2), FilterOperator::EQUAL),
+                    new Filter(new FilterField('id'), new IntFilterValue(3), FilterOperator::EQUAL),
+                    new CompositeFilter(
+                        FilterType::OR,
+                        new Filter(new FilterField('id'), new IntFilterValue(4), FilterOperator::EQUAL),
+                        new Filter(new FilterField('id'), new IntFilterValue(5), FilterOperator::EQUAL),
+                        new CompositeFilter(
+                            FilterType::OR,
+                            new Filter(new FilterField('id'), new IntFilterValue(6), FilterOperator::EQUAL),
+                            new CompositeFilter(
+                                FilterType::OR,
+                                new Filter(new FilterField('id'), new IntFilterValue(7), FilterOperator::EQUAL),
+                                new Filter(new FilterField('id'), new IntFilterValue(8), FilterOperator::EQUAL),
+                            ),
+                        ),
+                    ),
+                ),
+                new Filter(new FilterField('id'), new IntFilterValue(9), FilterOperator::EQUAL),
+                new CompositeFilter(
+                    FilterType::OR,
+                    new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
+                    new Filter(new FilterField('id'), new IntFilterValue(11), FilterOperator::EQUAL),
+                ),
+            ),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(11, $result);
+    }
+
+    public function testNestedCompositeFilters3(): void
+    {
+        $c = new Criteria(
+            new Filters(
+                FilterType::AND,
+                new Filter(new FilterField('id'), new IntFilterValue(1), FilterOperator::EQUAL),
+                new CompositeFilter(
+                    FilterType::OR,
+                    new Filter(new FilterField('id'), new IntFilterValue(2), FilterOperator::EQUAL),
+                    new Filter(new FilterField('id'), new IntFilterValue(3), FilterOperator::EQUAL),
+                ),
+            ),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(0, $result);
+    }
 }
