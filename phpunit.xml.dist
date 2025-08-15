@@ -25,9 +25,6 @@
         </include>
         <exclude>
             <directory>./vendor</directory>
-            <file>./src/Kernel.php</file>
-            <directory>./src/Entrypoint</directory>
-            <directory>./src/Infrastructure</directory>
         </exclude>
     </source>
 </phpunit>

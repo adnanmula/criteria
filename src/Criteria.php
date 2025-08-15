@@ -2,19 +2,18 @@
 
 namespace AdnanMula\Criteria;
 
-use AdnanMula\Criteria\FilterGroup\FilterGroup;
+use AdnanMula\Criteria\Filter\CompositeFilter;
+use AdnanMula\Criteria\Filter\Filter;
+use AdnanMula\Criteria\Filter\Filters;
 use AdnanMula\Criteria\Sorting\Sorting;
 
-final class Criteria
+final readonly class Criteria
 {
-    /** @var array<FilterGroup> */
-    private readonly array $filterGroups;
-
     public function __construct(
-        private readonly ?int $offset,
-        private readonly ?int $limit,
-        private readonly ?Sorting $sorting,
-        FilterGroup ...$filterGroups,
+        private Filters $filters = new Filters(),
+        private ?int $offset = null,
+        private ?int $limit = null,
+        private ?Sorting $sorting = null,
     ) {
         if (null !== $offset) {
             if (0 > $offset) {
@@ -31,34 +30,36 @@ final class Criteria
         if (null !== $offset && null === $sorting) {
             throw new \InvalidArgumentException('Order by must be specified when using offset to avoid inconsistent results');
         }
-
-        $this->filterGroups = $filterGroups;
     }
 
-    public function with(FilterGroup ...$groups): self
+    public function with(Filter|CompositeFilter ...$filters): self
     {
         return new self(
+            $this->filters->with(...$filters),
             $this->offset,
             $this->limit,
             $this->sorting,
-            ...$this->filterGroups,
-            ...$groups,
         );
     }
 
     public function withoutPagination(): self
     {
-        return new self(null, null, $this->sorting, ...$this->filterGroups);
+        return new self($this->filters, null, null, $this->sorting);
     }
 
     public function withoutPaginationAndSorting(): self
     {
-        return new self(null, null, null, ...$this->filterGroups);
+        return new self($this->filters, null, null, null);
     }
 
     public function withoutFilters(): self
     {
-        return new self($this->offset, $this->limit, $this->sorting);
+        return new self(new Filters(), $this->offset, $this->limit, $this->sorting);
+    }
+
+    public function filters(): Filters
+    {
+        return $this->filters;
     }
 
     public function offset(): ?int
@@ -74,11 +75,5 @@ final class Criteria
     public function sorting(): ?Sorting
     {
         return $this->sorting;
-    }
-
-    /** @return array<FilterGroup> */
-    public function filterGroups(): array
-    {
-        return $this->filterGroups;
     }
 }

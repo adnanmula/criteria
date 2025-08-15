@@ -37,56 +37,86 @@ composer require adnanmula/criteria
 The `Criteria` class is the main entry point for building queries:
 
 ```php
-// Create a criteria object with pagination, sorting and filters
+// Create a criteria object with filters, pagination and sorting
 $criteria = new Criteria(
-    10, // Offset
-    20, // Limit
-    new Sorting(
+    filters: new Filters(
+        FilterType::AND, // How top-level filters are combined
+        // Simple filter
+        new Filter(
+            new FilterField('status'),
+            new StringArrayFilterValue('active', 'pending', 'review'),
+            FilterOperator::IN,
+        ),
+        // Filter composed of other filters
+        new CompositeFilter(
+            FilterType::OR, // How each expression of this composite filter is combined
+            new Filter(
+                new FilterField('id'),
+                new StringFilterValue('abc123'),
+                FilterOperator::EQUAL,
+            ),
+            new Filter(
+                new FilterField('id'),
+                new StringFilterValue('asdasd'),
+                FilterOperator::EQUAL,
+            ),
+        ),
+        // Composite filters can contain other composite filters (example: (id = 'abc123') OR (amount <= 3 AND json_field @> '["value"]')
+        new CompositeFilter(
+            FilterType::OR,
+            new Filter(
+                new FilterField('id'),
+                new StringFilterValue('abc123'),
+                FilterOperator::EQUAL,
+            ),
+            new CompositeFilter(
+                FilterType::AND,
+                new Filter(
+                    new FilterField('amount'),
+                    new IntFilterValue(3),
+                    FilterOperator::LESS_OR_EQUAL,
+                ),
+                new Filter(
+                    new FilterField('json_field'),
+                    new ArrayElementFilterValue('value'),
+                    FilterOperator::IN_ARRAY,
+                ),
+            ),
+        ),
+        // You can add any number of filters or composite filters
+    ),
+    offset: 10,
+    limit: 20,
+    sorting: new Sorting(
         new Order(
             new FilterField('name'),
             OrderType::ASC,
         ),
         new Order(
             new FilterField('created_at'),
-            OrderType::DESC, 
-        ),
-    ),
-    // Combine multiple filter groups with AND/OR logic
-    new AndFilterGroup( // How this group connects to other groups (AND)
-        FilterType::OR, // How filters within this group are combined (OR)
-        new Filter(
-            new FilterField('id'),
-            new StringFilterValue('abc123'),
-            FilterOperator::EQUAL,
-        ),
-        new Filter(
-            new FilterField('status'),
-            new StringArrayFilterValue('active', 'pending', 'review'),
-            FilterOperator::IN,
-        ),
-        ...$moreFilters,
-    ),
-    new OrFilterGroup(   // How this group connects to other groups (OR)
-        FilterType::AND, // How filters within this group are combined (AND)
-        new Filter(
-            new FilterField('json_field'),
-            new ArrayElementFilterValue('value'),
-            FilterOperator::IN_ARRAY,
-        ),
-        new Filter(
-            new FilterField('amount'),
-            new IntFilterValue(3),
-            FilterOperator::LESS_OR_EQUAL,
+            OrderType::DESC,
         ),
     ),
 );
 
+// Helper methods
+// Copy a criteria adding any number of filters
+$originalCriteria = new Criteria();
+$newCriteria = new Criteria()->with(
+    new Filter(new FilterField('otherField'), new NullFilterValue(), FilterOperator::IS_NULL),
+    new CompositeFilter(
+        FilterType::OR,
+        new Filter(new FilterField('domainId'), new IntFilterValue(3), FilterOperator::EQUAL),
+        new Filter(new FilterField('random_string_or_null'), new StringFilterValue('imnotrandom'), FilterOperator::EQUAL),
+    ),
+);
+
 // Copy a criteria removing pagination
-$criteriaWithoutPagination = $criteria->withoutPagination();
+$newCriteria = $criteria->withoutPagination();
 // Copy a criteria removing pagination and sorting
-$criteriaWithoutFilters = $criteria->withoutPaginationAndSorting();
+$newCriteria = $criteria->withoutPaginationAndSorting();
 // Copy a criteria removing filters
-$criteriaWithoutFilters = $criteria->withoutFilters();
+$newCriteria = $criteria->withoutFilters();
 ```
 
 ### Using with Doctrine DBAL
@@ -105,7 +135,7 @@ $query = $builder->select('a.fields')
 (new DbalCriteriaAdapter($builder))->execute($criteria);
 
 // Execute the query
-$result = $query->execute()->fetchAllAssociative();
+$result = $query->executeQuery()->fetchAllAssociative();
 ```
 
 ### Filter Operators

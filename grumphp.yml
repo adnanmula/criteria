@@ -4,6 +4,8 @@ grumphp:
             - scripts/git-hooks/ko.txt
         succeeded:
             - scripts/git-hooks/ok.txt
+    parallel:
+        enabled: true
     tasks:
         composer:
             strict: true
@@ -16,6 +18,6 @@ grumphp:
         phpunit: ~
         phpversion:
             project: '8.4'
-        infection:
-          threads: 4
-          configuration: infection.json.dist
+#        infection:
+#          threads: 4
+#          configuration: infection.json.dist

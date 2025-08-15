@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdnanMula\Criteria\FilterValue;
+namespace AdnanMula\Criteria\Filter;
 
 enum FilterOperator
 {
