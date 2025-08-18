@@ -13,8 +13,15 @@ final readonly class FilterField implements FilterFieldInterface
         return $this->name;
     }
 
-    public function value(FieldMapping $mapping = new FieldMapping()): string
+    public function value(?FieldMapping $mapping = null): string
     {
-        return $mapping->get($this->name) ?? $this->name;
+        $name = $this->name;
+
+        if (null !== $mapping && $mapping->has($name)) {
+            /** @var string $name */
+            $name = $mapping->get($this->name);
+        }
+
+        return $name;
     }
 }
