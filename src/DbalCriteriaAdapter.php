@@ -59,33 +59,6 @@ final class DbalCriteriaAdapter
         }
     }
 
-    private function buildCompositeExpression(CompositeFilter $compositeFilter): ?CompositeExpression
-    {
-        $expressions = [];
-
-        foreach ($compositeFilter->filters() as $filter) {
-            if ($filter instanceof Filter) {
-                $expressions[] = $this->buildExpression($filter);
-            }
-
-            if ($filter instanceof CompositeFilter) {
-                $expression = $this->buildCompositeExpression($filter);
-
-                if (null !== $expression) {
-                    $expressions[] = $expression;
-                }
-            }
-        }
-
-        if (0 === \count($expressions)) {
-            return null;
-        }
-
-        return FilterType::OR === $compositeFilter->filtersGlue()
-            ? $this->queryBuilder->expr()->or(...$expressions)
-            : $this->queryBuilder->expr()->and(...$expressions);
-    }
-
     private function applySorting(Criteria $criteria): void
     {
         if (null !== $criteria->sorting()) {
@@ -142,6 +115,33 @@ final class DbalCriteriaAdapter
             FilterOperator::IN_ARRAY => $field . '::jsonb @> ' . $value . '::jsonb',
             FilterOperator::NOT_IN_ARRAY => 'not ' . $field . '::jsonb @> ' . $value . '::jsonb',
         };
+    }
+
+    private function buildCompositeExpression(CompositeFilter $compositeFilter): ?CompositeExpression
+    {
+        $expressions = [];
+
+        foreach ($compositeFilter->filters() as $filter) {
+            if ($filter instanceof Filter) {
+                $expressions[] = $this->buildExpression($filter);
+            }
+
+            if ($filter instanceof CompositeFilter) {
+                $expression = $this->buildCompositeExpression($filter);
+
+                if (null !== $expression) {
+                    $expressions[] = $expression;
+                }
+            }
+        }
+
+        if (0 === \count($expressions)) {
+            return null;
+        }
+
+        return FilterType::OR === $compositeFilter->filtersGlue()
+            ? $this->queryBuilder->expr()->or(...$expressions)
+            : $this->queryBuilder->expr()->and(...$expressions);
     }
 
     private function mapParameterValue(Filter $filter): mixed
