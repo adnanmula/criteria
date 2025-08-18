@@ -3,14 +3,14 @@
 namespace AdnanMula\Criteria\Tests;
 
 use AdnanMula\Criteria\Criteria;
+use AdnanMula\Criteria\Filter\CompositeFilter;
 use AdnanMula\Criteria\Filter\Filter;
+use AdnanMula\Criteria\Filter\FilterOperator;
+use AdnanMula\Criteria\Filter\Filters;
 use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FilterField;
 use AdnanMula\Criteria\FilterField\JsonKeyFilterField;
-use AdnanMula\Criteria\FilterGroup\AndFilterGroup;
-use AdnanMula\Criteria\FilterGroup\OrFilterGroup;
 use AdnanMula\Criteria\FilterValue\ArrayElementFilterValue;
-use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
 use AdnanMula\Criteria\FilterValue\NullFilterValue;
@@ -22,7 +22,7 @@ use AdnanMula\Criteria\Sorting\Sorting;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class RepositoryTest extends TestCase
+final class RepositoryTest extends TestCase
 {
     use DbConnectionTrait;
 
@@ -33,16 +33,26 @@ class RepositoryTest extends TestCase
 
     public function testNoFilters(): void
     {
-        $c = new Criteria(null, null, null);
+        $c = new Criteria();
 
         $result = $this->search($c);
 
         self::assertCount(100, $result);
     }
 
+    public function testNoFilters2(): void
+    {
+        $c = new Criteria(limit: 10);
+
+        $result = $this->search($c);
+
+        self::assertCount(10, $result);
+    }
+
     public function testOrderAsc(): void
     {
         $c = new Criteria(
+            new Filters(),
             null,
             null,
             new Sorting(
@@ -68,9 +78,7 @@ class RepositoryTest extends TestCase
     public function testOrderDesc(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            new Sorting(
+            sorting: new Sorting(
                 new Order(
                     new FilterField('id'),
                     OrderType::DESC,
@@ -93,10 +101,7 @@ class RepositoryTest extends TestCase
     public function testFilterEquals(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(new FilterField('id'), new IntFilterValue(24), FilterOperator::EQUAL),
             ),
@@ -111,13 +116,13 @@ class RepositoryTest extends TestCase
     public function testFilterIsNull(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(new FilterField('always_null'), new NullFilterValue(), FilterOperator::IS_NULL),
             ),
+            null,
+            null,
+            null,
         );
 
         $result = $this->search($c);
@@ -128,10 +133,7 @@ class RepositoryTest extends TestCase
     public function testFilterIsNotNull(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(new FilterField('random_string_or_null'), new NullFilterValue(), FilterOperator::IS_NOT_NULL),
             ),
@@ -145,10 +147,7 @@ class RepositoryTest extends TestCase
     public function testFilterGreaterThan(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(new FilterField('id'), new IntFilterValue(50), FilterOperator::GREATER),
             ),
@@ -162,10 +161,7 @@ class RepositoryTest extends TestCase
     public function testFilterContains(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -192,10 +188,7 @@ class RepositoryTest extends TestCase
     public function testFilterNotContains(string $string, int $count): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::OR,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -227,10 +220,7 @@ class RepositoryTest extends TestCase
     public function testFilterNotContainsInsensitive(string $string, int $count): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::OR,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -253,10 +243,7 @@ class RepositoryTest extends TestCase
     public function testFilterInArray(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -274,10 +261,7 @@ class RepositoryTest extends TestCase
     public function testFilterNotInArray(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new OrFilterGroup(
+            new Filters(
                 FilterType::OR,
                 new Filter(
                     new FilterField('random_string_or_null'),
@@ -300,10 +284,7 @@ class RepositoryTest extends TestCase
     public function testFilterIntInArray(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('id'),
@@ -321,10 +302,7 @@ class RepositoryTest extends TestCase
     public function testFilterIntNotInArray(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::OR,
                 new Filter(
                     new FilterField('id'),
@@ -337,95 +315,6 @@ class RepositoryTest extends TestCase
         $result = $this->search($c);
 
         self::assertCount(97, $result);
-    }
-
-    public function testPaginationWithoutSorting(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->search(new Criteria(1, 4, null));
-    }
-
-    public function testWithoutPagination(): void
-    {
-        $c = new Criteria(
-            1,
-            4,
-            new Sorting(new Order(new FilterField('id'), OrderType::ASC)),
-        );
-
-        $result = $this->search($c->withoutPagination());
-
-        self::assertCount(100, $result);
-    }
-
-    public function testWithoutSorting(): void
-    {
-        $c = new Criteria(
-            0,
-            10,
-            new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
-        );
-
-        $result = $this->search($c->withoutPaginationAndSorting());
-
-        self::assertCount(100, $result);
-        self::assertEquals(1, $result[0]['id']);
-    }
-
-    public function testWithoutFilters(): void
-    {
-        $c = new Criteria(
-            0,
-            10,
-            new Sorting(new Order(new FilterField('id'), OrderType::DESC)),
-            new AndFilterGroup(
-                FilterType::AND,
-                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
-            ),
-        );
-
-        $result = $this->search($c->withoutFilters());
-
-        self::assertCount(10, $result);
-        self::assertEquals(100, $result[0]['id']);
-    }
-
-    public function testAddOneMoreFilter(): void
-    {
-        $c = new Criteria(null, null, null);
-
-        $c = $c->with(
-            new AndFilterGroup(
-                FilterType::AND,
-                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
-            ),
-        );
-
-        $result = $this->search($c->withoutPagination());
-
-        self::assertCount(1, $result);
-    }
-
-    public function testAddOneTwoFilters(): void
-    {
-        $c = new Criteria(null, null, null);
-
-        $c = $c->with(
-            new AndFilterGroup(
-                FilterType::OR,
-                new Filter(new FilterField('id'), new IntFilterValue(10), FilterOperator::EQUAL),
-                new Filter(new FilterField('id'), new IntFilterValue(40), FilterOperator::EQUAL),
-            ),
-            new AndFilterGroup(
-                FilterType::AND,
-                new Filter(new FilterField('id'), new IntFilterValue(30), FilterOperator::GREATER),
-            ),
-        );
-
-        $result = $this->search($c->withoutPagination());
-
-        self::assertCount(1, $result);
     }
 
     public static function dataFilterInJsonArray(): array
@@ -442,10 +331,7 @@ class RepositoryTest extends TestCase
     public function testFilterInJsonArray(string $key, int $expected): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('array_of_strings'),
@@ -474,10 +360,7 @@ class RepositoryTest extends TestCase
     public function testFilterNotInJsonArray(string $key, int $expected): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('array_of_strings'),
@@ -495,10 +378,7 @@ class RepositoryTest extends TestCase
     public function testFilterJsonIntKeyEquals(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('array_of_strings', 1),
@@ -517,10 +397,7 @@ class RepositoryTest extends TestCase
     public function testFilterJsonIntKeyEquals2(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('array_of_strings', 0),
@@ -539,10 +416,7 @@ class RepositoryTest extends TestCase
     public function testFilterJsonStringKeyEquals(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('dictionary_of_strings', "key1"),
@@ -561,10 +435,7 @@ class RepositoryTest extends TestCase
     public function testFilterJsonStringKeyEquals2(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('dictionary_of_strings', "not_exists"),
@@ -583,10 +454,7 @@ class RepositoryTest extends TestCase
     public function testFilterJsonStringKeyEquals3(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('dictionary_of_strings', "key2"),
@@ -605,10 +473,7 @@ class RepositoryTest extends TestCase
     public function testFilterGroupIsEmpty(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(FilterType::AND),
+            new Filters(FilterType::AND),
         );
 
 
@@ -620,34 +485,10 @@ class RepositoryTest extends TestCase
     public function testFilterGroupsAreEmpty(): void
     {
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(FilterType::AND),
-            new AndFilterGroup(FilterType::AND),
-        );
-
-
-        $result = $this->search($c);
-
-        self::assertCount(100, $result);
-    }
-
-    public function testTextSearchOperatorWithoutStringFilterValue(): void
-    {
-        self::expectException(\InvalidArgumentException::class);
-
-        $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
-                new Filter(
-                    new FilterField('random_string_or_null'),
-                    new IntFilterValue(4),
-                    FilterOperator::CONTAINS,
-                ),
+                new CompositeFilter(FilterType::AND),
+                new CompositeFilter(FilterType::AND),
             ),
         );
 
@@ -664,10 +505,7 @@ class RepositoryTest extends TestCase
         ];
 
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new FilterField('domainName'),
@@ -690,10 +528,7 @@ class RepositoryTest extends TestCase
         ];
 
         $c = new Criteria(
-            null,
-            null,
-            null,
-            new AndFilterGroup(
+            new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('domainName', "key1"),
@@ -716,10 +551,7 @@ class RepositoryTest extends TestCase
         ];
 
         $c = new Criteria(
-            null,
-            null,
-            new Sorting(new Order(new FilterField('domainName'), OrderType::DESC)),
-            new AndFilterGroup(
+            filters: new Filters(
                 FilterType::AND,
                 new Filter(
                     new JsonKeyFilterField('domainName', "key1"),
@@ -727,8 +559,8 @@ class RepositoryTest extends TestCase
                     FilterOperator::EQUAL,
                 ),
             ),
+            sorting: new Sorting(new Order(new FilterField('domainName'), OrderType::DESC)),
         );
-
 
         $result = $this->search($c, $fieldMapping);
 

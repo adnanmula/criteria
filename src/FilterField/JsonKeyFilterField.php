@@ -14,11 +14,11 @@ final readonly class JsonKeyFilterField implements FilterFieldInterface
         return $this->name;
     }
 
-    public function value(FieldMapping $mapping = new FieldMapping()): string
+    public function value(?FieldMapping $mapping = null): string
     {
         $name = $this->name;
 
-        if ($mapping->has($name)) {
+        if (null !== $mapping && $mapping->has($name)) {
             /** @var string $name */
             $name = $mapping->get($name);
         }

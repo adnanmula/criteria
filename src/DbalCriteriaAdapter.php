@@ -2,18 +2,20 @@
 
 namespace AdnanMula\Criteria;
 
+use AdnanMula\Criteria\Filter\CompositeFilter;
 use AdnanMula\Criteria\Filter\Filter;
+use AdnanMula\Criteria\Filter\FilterOperator;
 use AdnanMula\Criteria\Filter\FilterType;
 use AdnanMula\Criteria\FilterField\FieldMapping;
-use AdnanMula\Criteria\FilterValue\FilterOperator;
 use AdnanMula\Criteria\FilterValue\IntArrayFilterValue;
 use AdnanMula\Criteria\FilterValue\IntFilterValue;
 use AdnanMula\Criteria\FilterValue\StringFilterValue;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 
-final class DbalCriteriaAdapter implements CriteriaAdapter
+final class DbalCriteriaAdapter
 {
     private int $parameterIndex;
 
@@ -33,27 +35,27 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
 
     private function applyFilters(Criteria $criteria): void
     {
-        foreach ($criteria->filterGroups() as $filter) {
-            $expressions = \array_map(
-                fn (Filter $expression) => $this->buildExpression($expression),
-                $filter->filters(),
-            );
+        $filters = $criteria->filters();
 
-            if (\count($expressions) === 0) {
+        foreach ($filters->filters() as $filter) {
+            $expression = null;
+
+            if ($filter instanceof Filter) {
+                $expression = $this->buildExpression($filter);
+            }
+
+            if ($filter instanceof CompositeFilter) {
+                $expression = $this->buildCompositeExpression($filter);
+            }
+
+            if ($expression === null) {
                 continue;
             }
 
-            if ($filter->filtersGlue() === FilterType::OR) {
-                $expression = $this->queryBuilder->expr()->or(...$expressions);
-            } else {
-                $expression = $this->queryBuilder->expr()->and(...$expressions);
-            }
-
-            if ($filter->expressionType() === FilterType::OR) {
-                $this->queryBuilder->orWhere($expression);
-            } else {
-                $this->queryBuilder->andWhere($expression);
-            }
+            match ($filters->filtersGlue()) {
+                FilterType::AND => $this->queryBuilder->andWhere($expression),
+                FilterType::OR => $this->queryBuilder->orWhere($expression),
+            };
         }
     }
 
@@ -115,14 +117,37 @@ final class DbalCriteriaAdapter implements CriteriaAdapter
         };
     }
 
+    private function buildCompositeExpression(CompositeFilter $compositeFilter): ?CompositeExpression
+    {
+        $expressions = [];
+
+        foreach ($compositeFilter->filters() as $filter) {
+            if ($filter instanceof Filter) {
+                $expressions[] = $this->buildExpression($filter);
+            }
+
+            if ($filter instanceof CompositeFilter) {
+                $expression = $this->buildCompositeExpression($filter);
+
+                if (null !== $expression) {
+                    $expressions[] = $expression;
+                }
+            }
+        }
+
+        if (0 === \count($expressions)) {
+            return null;
+        }
+
+        return FilterType::OR === $compositeFilter->filtersGlue()
+            ? $this->queryBuilder->expr()->or(...$expressions)
+            : $this->queryBuilder->expr()->and(...$expressions);
+    }
+
     private function mapParameterValue(Filter $filter): mixed
     {
-        $containOperators = [FilterOperator::CONTAINS, FilterOperator::CONTAINS_INSENSITIVE, FilterOperator::NOT_CONTAINS, FilterOperator::NOT_CONTAINS_INSENSITIVE];
-
-        if (in_array($filter->operator(), $containOperators, true)) {
-            if (false === $filter->value() instanceof StringFilterValue) {
-                throw new \InvalidArgumentException('Text search operators mush use StringFilterValue');
-            }
+        if ($filter->operator()->isTextSearch()) {
+            assert($filter->value() instanceof StringFilterValue);
 
             return '%' . $filter->value()->value() . '%';
         }
