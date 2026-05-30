@@ -65,7 +65,7 @@ final class DbalCriteriaAdapter
             foreach ($criteria->sorting()->order() as $order) {
                 $this->queryBuilder->addOrderBy(
                     $order->field()->value($this->fieldMapping),
-                    $order->type()->name,
+                    $order->type()->value,
                 );
             }
         }
