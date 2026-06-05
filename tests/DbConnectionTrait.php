@@ -57,6 +57,7 @@ trait DbConnectionTrait
                 random_string_or_null character varying(128) null,
                 always_null character varying(128) null,
                 random_numbers int,
+                random_numbers_with_null int,
                 array_of_strings jsonb null,
                 dictionary_of_strings jsonb null,
                 primary key(id)
@@ -69,11 +70,13 @@ trait DbConnectionTrait
     {
         for ($i = 1; $i < 101; ++$i) {
             $randomString = \random_int(0, 2) === 0 ? null : \bin2hex(\random_bytes(\random_int(5, 15)));
+            $randomNumber = \random_int(10000, 100000);
             $json = null;
             $dictionary = null;
 
             if ($i === 1) {
                 $randomString = null;
+                $randomNumber = null;
                 $json = '["aaa", "bbb"]';
                 $dictionary = '{"key1":"value1","key2":"value2","key3":"value3"}';
             }
@@ -93,6 +96,7 @@ trait DbConnectionTrait
                 'random_string_or_null' => $randomString,
                 'always_null' => null,
                 'random_numbers' => \random_int(0, 10000),
+                'random_numbers_with_null' => $randomNumber,
                 'array_of_strings' => $json,
                 'dictionary_of_strings' => $dictionary,
             ]);

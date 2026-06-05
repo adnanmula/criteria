@@ -23,7 +23,12 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "@auto-scripts",
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "post-autoload-dump": [
             "rm -rf .git/hooks",
             "cp -r scripts/git-hooks .git/hooks"
         ]

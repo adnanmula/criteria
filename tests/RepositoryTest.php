@@ -566,4 +566,90 @@ final class RepositoryTest extends TestCase
 
         self::assertCount(2, $result);
     }
+
+    public function testFilterByOrderByAscNullsFirst(): void
+    {
+        $c = new Criteria(
+            sorting: new Sorting(new Order(new FilterField('random_numbers_with_null'), OrderType::ASC_NULLS_FIRST)),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+
+        $lastValue = 0;
+        foreach ($result as $index => $row) {
+            if ($index === 0) {
+                self::assertNull($row['random_numbers_with_null']);
+            } else {
+                self::assertGreaterThanOrEqual($lastValue, $row['random_numbers_with_null']);
+                $lastValue = $row['random_numbers_with_null'];
+            }
+        }
+    }
+
+    public function testFilterByOrderByAscNullsLast(): void
+    {
+        $c = new Criteria(
+            sorting: new Sorting(new Order(new FilterField('random_numbers_with_null'), OrderType::ASC_NULLS_LAST)),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+
+        $lastValue = 0;
+        foreach ($result as $index => $row) {
+            if ($index === 99) {
+                self::assertNull($row['random_numbers_with_null']);
+            } else {
+                self::assertGreaterThanOrEqual($lastValue, $row['random_numbers_with_null']);
+            }
+
+            $lastValue = $row['random_numbers_with_null'];
+        }
+    }
+
+    public function testFilterByOrderByDescNullsFirst(): void
+    {
+        $c = new Criteria(
+            sorting: new Sorting(new Order(new FilterField('random_numbers_with_null'), OrderType::DESC_NULLS_FIRST)),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+
+        $lastValue = \PHP_INT_MAX;
+        foreach ($result as $index => $row) {
+            if ($index === 0) {
+                self::assertNull($row['random_numbers_with_null']);
+            } else {
+                self::assertLessThanOrEqual($lastValue, $row['random_numbers_with_null']);
+                $lastValue = $row['random_numbers_with_null'];
+            }
+        }
+    }
+
+    public function testFilterByOrderByDescNullsLast(): void
+    {
+        $c = new Criteria(
+            sorting: new Sorting(new Order(new FilterField('random_numbers_with_null'), OrderType::DESC_NULLS_LAST)),
+        );
+
+        $result = $this->search($c);
+
+        self::assertCount(100, $result);
+
+        $lastValue = \PHP_INT_MAX;
+        foreach ($result as $index => $row) {
+            if ($index === 99) {
+                self::assertNull($row['random_numbers_with_null']);
+            } else {
+                self::assertLessThanOrEqual($lastValue, $row['random_numbers_with_null']);
+            }
+
+            $lastValue = $row['random_numbers_with_null'];
+        }
+    }
 }
