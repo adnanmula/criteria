@@ -155,7 +155,7 @@ final class DbalCriteriaAdapter
         return $filter->value()->value();
     }
 
-    private function mapType(Filter $filter): int
+    private function mapType(Filter $filter): ArrayParameterType|ParameterType
     {
         if (FilterOperator::IN === $filter->operator() || FilterOperator::NOT_IN === $filter->operator()) {
             if ($filter->value() instanceof IntArrayFilterValue) {
